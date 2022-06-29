@@ -1,6 +1,8 @@
 package cn.xmp.zkserver.kit;
 
+import cn.xmp.zkserver.cache.ServerCache;
 import cn.xmp.zkserver.config.AppConfiguration;
+import com.google.common.cache.LoadingCache;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +20,22 @@ public class ZKit {
     private ZkClient zkClient;
 
     @Autowired
-    private AppConfiguration appConfiguration ;
+    private AppConfiguration appConfiguration;
+
+    @Autowired
+    private ServerCache serverCache;
 
     /**
      * 创建父级节点
      */
-    public void createRootNode(){
+    public void createRootNode() {
         boolean exists = zkClient.exists(appConfiguration.getZkRoot());
-        if (exists){
+        if (exists) {
             return;
         }
 
         //创建 root
-        zkClient.createPersistent(appConfiguration.getZkRoot()) ;
+        zkClient.createPersistent(appConfiguration.getZkRoot());
     }
 
     /**
@@ -44,14 +49,15 @@ public class ZKit {
 
     /**
      * 监听zk注册事件
+     *
      * @param path
      */
     public void subscribeEvent(String path) {
         zkClient.subscribeChildChanges(path, (parentPath, currentChildren) -> {
-            logger.info("Clear and update local cache parentPath=[{}],currentChildren=[{}]", parentPath,currentChildren.toString());
+            logger.info("Clear and update local cache parentPath=[{}],currentChildren=[{}]", parentPath, currentChildren.toString());
 
             //update local cache, delete and save.
-//                serverCache.updateCache(currentChildren) ;
+            serverCache.updateCache(currentChildren);
         });
     }
 }

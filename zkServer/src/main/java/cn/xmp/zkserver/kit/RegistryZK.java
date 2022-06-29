@@ -2,12 +2,12 @@ package cn.xmp.zkserver.kit;
 
 import cn.xmp.zkserver.config.AppConfiguration;
 import cn.xmp.zkserver.util.SpringBeanFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class RegistryZK implements Runnable {
-
-    private static Logger logger = LoggerFactory.getLogger(RegistryZK.class);
 
     private ZKit zKit;
 
@@ -35,7 +35,7 @@ public class RegistryZK implements Runnable {
         if (appConfiguration.isZkSwitch()){
             String path = appConfiguration.getZkRoot() + "/ip-" + ip + ":" + cimServerPort + ":" + httpPort;
             zKit.createNode(path);
-            logger.info("Registry zookeeper success, msg=[{}]", path);
+            log.info("Registry zookeeper success, msg=[{}]", path);
         }
 
         //注册监听服务
